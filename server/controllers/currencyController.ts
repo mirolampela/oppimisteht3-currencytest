@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { calculateConversion } from "../utils/convert";
+import { convert } from "../services/currencyService";
 
 export const convertAmount = async (req: Request, res: Response) => {
   try {
@@ -15,8 +15,7 @@ export const convertAmount = async (req: Request, res: Response) => {
       });
     } else if (
       !currencyCodePattern.test(fromCode) ||
-      !currencyCodePattern.test(toCode)
-    ) {
+      !currencyCodePattern.test(toCode)) {
       res.status(400).json({
         error:
           "Currency codes must be 3-letter ISO abbreviations (e.g., USD, EUR).",
@@ -28,8 +27,8 @@ export const convertAmount = async (req: Request, res: Response) => {
       } else if (parsedAmount <= 0) {
         res.status(400).json({ error: "Amount must be greater than zero." });
       } else {
-        const data = calculateConversion(amount, 0.9);
-        res.status(200).json({ amount: data });
+        const data = await convert(from,to,amount)
+        res.status(200).json(data);
       }
     }
   } catch (error) {
